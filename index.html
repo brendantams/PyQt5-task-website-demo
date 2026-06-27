@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python OOP for PyQt5 — 5 Hands-On Tasks</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e10;
+    --surface: #17171a;
+    --surface2: #1e1e22;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --text: #f0f0f0;
+    --muted: #888;
+    --faint: #555;
+    --accent: #7b6ef6;
+    --accent-bg: rgba(123,110,246,0.12);
+    --accent-border: rgba(123,110,246,0.3);
+    --green: #3ecf8e;
+    --green-bg: rgba(62,207,142,0.1);
+    --amber: #f59e0b;
+    --amber-bg: rgba(245,158,11,0.1);
+    --coral: #f97066;
+    --coral-bg: rgba(249,112,102,0.1);
+    --blue: #60a5fa;
+    --blue-bg: rgba(96,165,250,0.1);
+    --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 1.5rem 2rem;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .header-desc {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 500px;
+    line-height: 1.7;
+  }
+
+  .concept-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 1.25rem;
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border-strong);
+    color: var(--muted);
+  }
+
+  /* Main content */
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* Task cards */
+  .task {
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .task:hover { border-color: var(--border-strong); }
+  .task.open { border-color: var(--accent-border); }
+
+  .task-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 1.1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    background: var(--surface);
+  }
+
+  .task-header:hover { background: var(--surface2); }
+
+  .num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .task-meta { flex: 1; }
+
+  .task-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .task-sub {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+
+  .tag {
+    font-size: 10px;
+    font-family: var(--mono);
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+  }
+
+  .chevron {
+    color: var(--faint);
+    font-size: 18px;
+    line-height: 28px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .task.open .chevron { transform: rotate(180deg); }
+
+  /* Task body */
+  .task-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .task.open .task-body { display: block; }
+
+  .task-desc {
+    padding: 1.1rem 1.25rem;
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.75;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: #d4b8ff;
+  }
+
+  /* Code block */
+  .code-block {
+    margin: 0;
+    padding: 1.1rem 1.25rem;
+    background: #111113;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #cdd6f4;
+    margin: 0;
+    white-space: pre;
+  }
+
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .cls { color: #f38ba8; }
+  .str { color: #a6e3a1; }
+  .cmt { color: #585b70; font-style: italic; }
+  .num-lit { color: #fab387; }
+  .self-kw { color: #f5c2e7; }
+
+  /* Hints */
+  .hints {
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+  }
+
+  .hints-label {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.6rem;
+  }
+
+  .hints ul {
+    padding-left: 1.1rem;
+    margin: 0;
+  }
+
+  .hints li {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 5px;
+    line-height: 1.6;
+  }
+
+  .hints li strong { color: #bbb; font-weight: 500; }
+
+  /* Footer */
+  footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--faint);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 500px) {
+    header, main, footer { padding-left: 1rem; padding-right: 1rem; }
+    h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Python OOP for PyQt5</p>
+  <h1>5 hands-on tasks to learn <span>classes & GUIs</span></h1>
+  <p class="header-desc">Each task builds a concept you'll use directly when making desktop apps with PyQt5. Work through them in order — they connect.</p>
+  <div class="concept-pills">
+    <span class="pill">inheritance</span>
+    <span class="pill">composition</span>
+    <span class="pill">encapsulation</span>
+    <span class="pill">__init__</span>
+    <span class="pill">method overriding</span>
+    <span class="pill">self</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Task 1 -->
+  <div class="task open" onclick="toggle(this)">
+    <div class="task-header">
+      <div class="num" style="background:var(--blue-bg);color:var(--blue);">1</div>
+      <div class="task-meta">
+        <p class="task-name">Build a custom button class</p>
+        <p class="task-sub">Subclassing QPushButton</p>
+        <div class="tags">
+          <span class="tag" style="background:var(--blue-bg);color:var(--blue);">inheritance</span>
+          <span class="tag" style="background:var(--accent-bg);color:var(--accent);">__init__</span>
+        </div>
+      </div>
+      <span class="chevron">⌄</span>
+    </div>
+    <div class="task-body">
+      <div class="task-desc">
+        Create a class <code>StyledButton</code> that extends <code>QPushButton</code>. It should accept <code>label</code> and <code>color</code> as constructor arguments, and set its own stylesheet automatically on creation — no styling code outside the class.
+      </div>
+      <div class="code-block"><pre><span class="kw">from</span> PyQt5.QtWidgets <span class="kw">import</span> QPushButton
+
+<span class="kw">class</span> <span class="cls">StyledButton</span>(QPushButton):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self-kw">self</span>, label, color):
+        <span class="kw">super</span>().__init__(label)
+        <span class="self-kw">self</span>.setStyleSheet(<span class="str">f"background: {color}; border-radius: 6px; padding: 8px 16px;"</span>)
+
+<span class="cmt"># Usage — the button styles itself:</span>
+btn = <span class="cls">StyledButton</span>(<span class="str">"Submit"</span>, <span class="str">"#7b6ef6"</span>)</pre></div>
+      <div class="hints">
+        <p class="hints-label">Hints</p>
+        <ul>
+          <li><code>super().__init__(label)</code> passes the text to QPushButton — always call this first</li>
+          <li>Because styling happens inside <code>__init__</code>, every instance styles itself automatically</li>
+          <li><strong>Challenge:</strong> add a <code>set_color()</code> method so you can change the colour later</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 2 -->
+  <div class="task" onclick="toggle(this)">
+    <div class="task-header">
+      <div class="num" style="background:var(--green-bg);color:var(--green);">2</div>
+      <div class="task-meta">
+        <p class="task-name">Make a reusable label + input widget</p>
+        <p class="task-sub">Composition with QWidget</p>
+        <div class="tags">
+          <span class="tag" style="background:var(--green-bg);color:var(--green);">composition</span>
+          <span class="tag" style="background:var(--accent-bg);color:var(--accent);">self attributes</span>
+        </div>
+      </div>
+      <span class="chevron">⌄</span>
+    </div>
+    <div class="task-body">
+      <div class="task-desc">
+        Build a class <code>LabeledInput</code> that wraps a <code>QLabel</code> and <code>QLineEdit</code> together in a vertical layout. Give it a method <code>get_value()</code> that returns the typed text.
+      </div>
+      <div class="code-block"><pre><span class="kw">from</span> PyQt5.QtWidgets <span class="kw">import</span> QWidget, QLabel, QLineEdit, QVBoxLayout
+
+<span class="kw">class</span> <span class="cls">LabeledInput</span>(QWidget):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self-kw">self</span>, label_text):
+        <span class="kw">super</span>().__init__()
+        layout = QVBoxLayout(<span class="self-kw">self</span>)
+        layout.addWidget(QLabel(label_text))
+        <span class="self-kw">self</span>.input = QLineEdit()
+        layout.addWidget(<span class="self-kw">self</span>.input)
+
+    <span class="kw">def</span> <span class="fn">get_value</span>(<span class="self-kw">self</span>):
+        <span class="kw">return</span> <span class="self-kw">self</span>.input.text()
+
+<span class="cmt"># Usage:</span>
+name_field = <span class="cls">LabeledInput</span>(<span class="str">"Patient name"</span>)
+print(name_field.get_value())</pre></div>
+      <div class="hints">
+        <p class="hints-label">Hints</p>
+        <ul>
+          <li>Inherit from <code>QWidget</code>, not from <code>QLineEdit</code> — the class <strong>has</strong> a widget, it doesn't <strong>become</strong> one</li>
+          <li>Storing the input as <code>self.input</code> means <code>get_value()</code> can reach it</li>
+          <li><strong>Challenge:</strong> add a <code>set_placeholder(text)</code> method that sets placeholder text on the input</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 3 -->
+  <div class="task" onclick="toggle(this)">
+    <div class="task-header">
+      <div class="num" style="background:var(--accent-bg);color:var(--accent);">3</div>
+      <div class="task-meta">
+        <p class="task-name">A screen base class</p>
+        <p class="task-sub">Abstract patterns and shared behaviour</p>
+        <div class="tags">
+          <span class="tag" style="background:var(--accent-bg);color:var(--accent);">base class</span>
+          <span class="tag" style="background:var(--amber-bg);color:var(--amber);">method overriding</span>
+        </div>
+      </div>
+      <span class="chevron">⌄</span>
+    </div>
+    <div class="task-body">
+      <div class="task-desc">
+        Create a <code>BaseScreen</code> class with a shared title label and a <code>setup_ui()</code> method that does nothing. Then make two screens — <code>HomeScreen</code> and <code>ResultScreen</code> — that each override <code>setup_ui()</code> to add their own content.
+      </div>
+      <div class="code-block"><pre><span class="kw">from</span> PyQt5.QtWidgets <span class="kw">import</span> QWidget, QLabel, QPushButton, QVBoxLayout
+
+<span class="kw">class</span> <span class="cls">BaseScreen</span>(QWidget):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self-kw">self</span>, title):
+        <span class="kw">super</span>().__init__()
+        <span class="self-kw">self</span>.layout = QVBoxLayout(<span class="self-kw">self</span>)
+        <span class="self-kw">self</span>.layout.addWidget(QLabel(title))
+        <span class="self-kw">self</span>.setup_ui()  <span class="cmt"># each subclass fills this in</span>
+
+    <span class="kw">def</span> <span class="fn">setup_ui</span>(<span class="self-kw">self</span>):
+        <span class="kw">pass</span>  <span class="cmt"># subclasses override this</span>
+
+<span class="kw">class</span> <span class="cls">HomeScreen</span>(<span class="cls">BaseScreen</span>):
+    <span class="kw">def</span> <span class="fn">setup_ui</span>(<span class="self-kw">self</span>):
+        <span class="self-kw">self</span>.layout.addWidget(QPushButton(<span class="str">"Start screening"</span>))
+
+<span class="kw">class</span> <span class="cls">ResultScreen</span>(<span class="cls">BaseScreen</span>):
+    <span class="kw">def</span> <span class="fn">setup_ui</span>(<span class="self-kw">self</span>):
+        <span class="self-kw">self</span>.layout.addWidget(QLabel(<span class="str">"Results will appear here"</span>))</pre></div>
+      <div class="hints">
+        <p class="hints-label">Hints</p>
+        <ul>
+          <li><code>BaseScreen.__init__</code> calls <code>self.setup_ui()</code> — so subclass content gets added automatically</li>
+          <li>This is the exact pattern behind a <code>QStackedWidget</code> multi-screen app</li>
+          <li><strong>Challenge:</strong> add a <code>go_back()</code> method to <code>BaseScreen</code> that prints "go back" — override it in one subclass</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 4 -->
+  <div class="task" onclick="toggle(this)">
+    <div class="task-header">
+      <div class="num" style="background:var(--amber-bg);color:var(--amber);">4</div>
+      <div class="task-meta">
+        <p class="task-name">Yes/No question widget</p>
+        <p class="task-sub">Encapsulation and state</p>
+        <div class="tags">
+          <span class="tag" style="background:var(--amber-bg);color:var(--amber);">encapsulation</span>
+          <span class="tag" style="background:var(--blue-bg);color:var(--blue);">instance state</span>
+        </div>
+      </div>
+      <span class="chevron">⌄</span>
+    </div>
+    <div class="task-body">
+      <div class="task-desc">
+        Build a <code>YesNoQuestion</code> widget that takes a question string, shows two buttons (Yes / No), and tracks which was selected internally. Add a method <code>get_answer()</code> that returns <code>True</code>, <code>False</code>, or <code>None</code>.
+      </div>
+      <div class="code-block"><pre><span class="kw">from</span> PyQt5.QtWidgets <span class="kw">import</span> QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout
+
+<span class="kw">class</span> <span class="cls">YesNoQuestion</span>(QWidget):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="self-kw">self</span>, question):
+        <span class="kw">super</span>().__init__()
+        <span class="self-kw">self</span>._answer = <span class="kw">None</span>  <span class="cmt"># internal state</span>
+        layout = QVBoxLayout(<span class="self-kw">self</span>)
+        layout.addWidget(QLabel(question))
+        btns = QHBoxLayout()
+        yes = QPushButton(<span class="str">"Yes"</span>)
+        no  = QPushButton(<span class="str">"No"</span>)
+        yes.clicked.connect(<span class="kw">lambda</span>: <span class="self-kw">self</span>._set(<span class="kw">True</span>))
+        no.clicked.connect(<span class="kw">lambda</span>: <span class="self-kw">self</span>._set(<span class="kw">False</span>))
+        btns.addWidget(yes)
+        btns.addWidget(no)
+        layout.addLayout(btns)
+
+    <span class="kw">def</span> <span class="fn">_set</span>(<span class="self-kw">self</span>, value):
+        <span class="self-kw">self</span>._answer = value
+
+    <span class="kw">def</span> <span class="fn">get_answer</span>(<span class="self-kw">self</span>):
+        <span class="kw">return</span> <span class="self-kw">self</span>._answer</pre></div>
+      <div class="hints">
+        <p class="hints-label">Hints</p>
+        <ul>
+          <li>The underscore in <code>_answer</code> signals it's internal — nothing outside the class should set it directly</li>
+          <li><code>lambda: self._set(True)</code> is a common pattern for connecting buttons with arguments</li>
+          <li><strong>Challenge:</strong> visually highlight the selected button (e.g. bold text) when clicked</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 5 -->
+  <div class="task" onclick="toggle(this)">
+    <div class="task-header">
+      <div class="num" style="background:var(--coral-bg);color:var(--coral);">5</div>
+      <div class="task-meta">
+        <p class="task-name">Mini form that collects itself</p>
+        <p class="task-sub">Putting it all together</p>
+        <div class="tags">
+          <span class="tag" style="background:var(--coral-bg);color:var(--coral);">composition</span>
+          <span class="tag" style="background:var(--accent-bg);color:var(--accent);">inheritance</span>
+          <span class="tag" style="background:var(--amber-bg);color:var(--amber);">encapsulation</span>
+        </div>
+      </div>
+      <span class="chevron">⌄</span>
+    </div>
+    <div class="task-body">
+      <div class="task-desc">
+        Build a <code>PatientForm</code> screen using your classes from tasks 1–4. It should contain two <code>LabeledInput</code> widgets (name, location) and one <code>YesNoQuestion</code>. Add a <code>get_data()</code> method that returns a dict with all three values. Wire up a <code>StyledButton</code> that prints the result.
+      </div>
+      <div class="code-block"><pre><span class="kw">class</span> <span class="cls">PatientForm</span>(<span class="cls">BaseScreen</span>):
+    <span class="kw">def</span> <span class="fn">setup_ui</span>(<span class="self-kw">self</span>):
+        <span class="self-kw">self</span>.name     = <span class="cls">LabeledInput</span>(<span class="str">"Name"</span>)
+        <span class="self-kw">self</span>.location = <span class="cls">LabeledInput</span>(<span class="str">"Location"</span>)
+        <span class="self-kw">self</span>.fever    = <span class="cls">YesNoQuestion</span>(<span class="str">"Do you have a fever?"</span>)
+        submit        = <span class="cls">StyledButton</span>(<span class="str">"Submit"</span>, <span class="str">"#7b6ef6"</span>)
+        submit.clicked.connect(<span class="kw">lambda</span>: print(<span class="self-kw">self</span>.get_data()))
+
+        <span class="kw">for</span> w <span class="kw">in</span> [<span class="self-kw">self</span>.name, <span class="self-kw">self</span>.location, <span class="self-kw">self</span>.fever, submit]:
+            <span class="self-kw">self</span>.layout.addWidget(w)
+
+    <span class="kw">def</span> <span class="fn">get_data</span>(<span class="self-kw">self</span>):
+        <span class="kw">return</span> {
+            <span class="str">"name"</span>:     <span class="self-kw">self</span>.name.get_value(),
+            <span class="str">"location"</span>: <span class="self-kw">self</span>.location.get_value(),
+            <span class="str">"fever"</span>:    <span class="self-kw">self</span>.fever.get_answer(),
+        }</pre></div>
+      <div class="hints">
+        <p class="hints-label">Hints</p>
+        <ul>
+          <li>Each component manages its own state — <code>PatientForm</code> just calls their methods to read it</li>
+          <li>This is how your NTD symptom questionnaire works — each question is a self-contained object</li>
+          <li><strong>Challenge:</strong> add validation — only print data if name isn't empty and an answer was selected</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span>Python OOP for PyQt5 — 5 hands-on tasks</span>
+  <span>Click any card to expand</span>
+</footer>
+
+<script>
+function toggle(card) {
+  card.classList.toggle('open');
+}
+</script>
+</body>
+</html>
